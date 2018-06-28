@@ -17,7 +17,5 @@ def self.get_duplicates(*columns)
 
 end 
 
-columns = [ :title,:description,:link,:pubDate,:image_url ]
-Model.get_duplicates(*columns).dedupe(*columns)
 
-end 
+

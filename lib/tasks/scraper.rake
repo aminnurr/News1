@@ -1,14 +1,15 @@
 require 'rss'
 require 'open-uri'
 require 'nokogiri'
+require 'rake'
 #require 'carrier-wave'
 
 namespace :db do
 
   desc "rss_scraper"
-   task :rss_scraper,[:url] => [:environment] do|t,args|
+  task :rss_scraper,[:url] => [:environment] do|t,args|
      url = args.url  # how to you pass arugments to tasks
-  #  url = ('http://feeds.bbci.co.uk/news/world/africa/rss.xml')
+   #url = ('http://feeds.bbci.co.uk/news/world/africa/rss.xml')
      doc= Nokogiri::HTML(open(url))
       items = doc.xpath('//item')
        items.each  do |item|
@@ -27,10 +28,14 @@ namespace :db do
       end
 end
 
+end
+
 desc " scrapping bbc for paragraph content"
- task bbc_scraper: :environment do [:rss_scraper]
-  :link.each do |link|
-    puts :link
+ task full_scraper: :environment do
+   href = 'http://feeds.bbci.co.uk/news/world/africa/rss.xml'
+   Rake::Task['db:rss_scraper'].invoke(href)
+  @link.each do |link|
+
 
      if /^https?:\/\/www\.voasomali/.match(link)
         page    = open("#{link}")
@@ -54,6 +59,7 @@ desc " scrapping bbc for paragraph content"
       data.save
 
     end
+     Rake::Task(db:remove_data_duplication).invoke
   end
 end
 
@@ -66,6 +72,4 @@ task remove_data_duplication: :environment  do
     duplicates.destroy_all
   end
 end
-end
-
 end
